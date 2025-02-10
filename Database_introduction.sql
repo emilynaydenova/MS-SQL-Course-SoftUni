@@ -73,6 +73,7 @@ CONSTRAINT [Pk_RR] PRIMARY KEY ([Id])
 ALTER TABLE Minions
 ADD TownID INT FOREIGN KEY REFERENCES Towns(Id)
 GO
+
 --2nd solution - in 2 steps
 --add new column TownId
 ALTER TABLE Minions
@@ -80,8 +81,9 @@ ADD TownID INT;
 GO
 -- Add new constraint FK - named
 ALTER TABLE Minions
-ADD CONSTRAINT FK_MinionTownID
-FOREIGN KEY (TownID) REFERENCES Towns(Id);
+ALTER TABLE Minions
+ADD CONSTRAINT FK_MinionTownID FOREIGN KEY (TownID) REFERENCES Towns(Id);
+
 GO
 /*
 CREATE TABLE child_table
@@ -180,7 +182,8 @@ Username VARCHAR(30) UNIQUE NOT NULL,
 [Password] VARCHAR(26) NOT NULL,
 ProfilePicture VARBINARY(MAX) CHECK(DATALENGTH(ProfilePicture) <= (900 * 1024)),
 LastLoginTime DATETIME2,
-IsDeleted BIT NOT NULL         -- no boolean datatype in sql /only in Postgresql
+IsDeleted BIT NOT NULL       -- no boolean datatype in sql /only in Postgresql
+-- as BIT can be 0,1 or NULL, constaraint NOT NULL limited values to 0 or 1.
 );
 
 INSERT INTO Users (Username, [Password], ProfilePicture,LastLoginTime,IsDeleted)
@@ -197,6 +200,7 @@ select * from information_schema.table_constraints
 where table_name = 'Users'
 
 -- Problem 9.
+-- Composite PK
 ALTER TABLE Users
 DROP CONSTRAINT PK__Users__3214EC07843B549C
 
@@ -217,10 +221,13 @@ ADD CONSTRAINT  DF_logintime DEFAULT GETDATE() FOR LastLoginTime
 -- Problem 12.
 select * from information_schema.table_constraints
 where table_name = 'Users'
+
 ALTER TABLE USERS
 DROP CONSTRAINT PK_Users
+
 ALTER TABLE USERS
 ADD CONSTRAINT PK_Users PRIMARY KEY (Id)
+
 ALTER TABLE Users
 ADD CONSTRAINT CK_Username CHECK (LEN(Username) >=3)
 
@@ -572,7 +579,21 @@ SELECT FirstName, LastName, JobTitle, Salary FROM Employees ORDER BY Salary DESC
 
 ----------Problem 22.	Increase Employees Salary ------
 SELECT * FROM Employees;
+
 UPDATE Employees
  SET Salary *= 1.1;
+
 SELECT Salary FROM Employees;
 
+----------Problem 23.	Decrease Tax Rate
+USE Hotel
+GO
+
+UPDATE Payments
+	SET TaxRate *=0.97
+SELECT TaxRate FROM Payments
+
+----------Problem 24.	Delete All Records
+
+TRUNCATE TABLE  Occupancies;
+SELECT * FROM  Occupancies;
